@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voup.education.mapper.TeacherMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.voup.education.entity.Teacher">
+        <id column="id" property="id" />
+        <result column="teacherCode" property="teacherCode" />
+        <result column="teacherName" property="teacherName" />
+        <result column="sex" property="sex" />
+        <result column="birth" property="birth" />
+        <result column="background" property="background" />
+        <result column="position" property="position" />
+        <result column="entryTime" property="entryTime" />
+        <result column="college" property="college" />
+    </resultMap>
+
+</mapper>
