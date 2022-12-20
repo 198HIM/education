@@ -18,34 +18,22 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("t_teacher")
-public class Teacher implements Serializable {
+@TableName("t_student")
+public class Student implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Integer id;
 
-    @TableField("teacherCode")
-    private String teacherCode;
+    @TableField("studentCode")
+    private String studentCode;
 
-    @TableField("teacherName")
-    private String teacherName;
+    @TableField("studentName")
+    private String studentName;
 
     @TableField("sex")
     private String sex;
-
-    @TableField("birth")
-    private String birth;
-
-    @TableField("background")
-    private String background;
-
-    @TableField("position")
-    private String position;
-
-    @TableField("entryTime")
-    private String entryTime;
 
     @TableField("college")
     private String college;

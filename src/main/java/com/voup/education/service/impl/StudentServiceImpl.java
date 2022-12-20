@@ -1,8 +1,8 @@
 package com.voup.education.service.impl;
 
-import com.voup.education.entity.Teacher;
-import com.voup.education.mapper.TeacherMapper;
-import com.voup.education.service.TeacherService;
+import com.voup.education.entity.Student;
+import com.voup.education.mapper.StudentMapper;
+import com.voup.education.service.StudentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2022-12-20
  */
 @Service
-public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> implements TeacherService {
+public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> implements StudentService {
 
 }

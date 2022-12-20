@@ -1,6 +1,6 @@
 package com.voup.education.mapper;
 
-import com.voup.education.entity.Course;
+import com.voup.education.entity.Student;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author voup
  * @since 2022-12-20
  */
-public interface CourseMapper extends BaseMapper<Course> {
+public interface StudentMapper extends BaseMapper<Student> {
 
 }

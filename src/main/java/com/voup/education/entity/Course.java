@@ -14,11 +14,11 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author voup
- * @since 2022-12-17
+ * @since 2022-12-20
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("course")
+@TableName("t_course")
 public class Course implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,8 +29,8 @@ public class Course implements Serializable {
     @TableField("courseCode")
     private String courseCode;
 
-    @TableField("couseName")
-    private String couseName;
+    @TableField("courseName")
+    private String courseName;
 
     /**
      * 授课老师编号
