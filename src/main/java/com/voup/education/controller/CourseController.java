@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2022-12-17
  */
 @Slf4j
+@CrossOrigin(origins = "*",maxAge = 3600)
 @RestController
 @RequestMapping("//course")
 public class CourseController {
@@ -36,8 +37,10 @@ public class CourseController {
 
         Page<Course> page = new Page<>(coursePage.getCurrentPage(), coursePage.getPageSize());
         QueryWrapper<Course> queryWrapper = new QueryWrapper<>();
+        System.out.println(coursePage.getCourse().getCourseName());
         //查询操作
         queryWrapper.like("courseName", coursePage.getCourse().getCourseName());
+        queryWrapper.like("teacherCode", coursePage.getCourse().getTeacherCode());
         //填入数据
         courseMapper.selectPage(page, queryWrapper);
         //测试数据
@@ -63,8 +66,27 @@ public class CourseController {
     //更新
     @PostMapping("/update")
     public R update(@RequestBody Course course) {
+        if (courseService.getOne(new QueryWrapper<Course>().eq("courseCode",course.getCourseCode()))==null){
+            //自增长courseCode
+            for (int i = 0; i < 9999; i++) {
+                course.setCourseCode(i + "");
+
+                QueryWrapper<Course> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("courseCode", i + "");
+                if (courseService.getOne(queryWrapper) == null) {
+                    break;
+                }
+            }
+
+            if (courseService.save(course)) {
+                return R.success("", "添加成功");
+            } else {
+                return R.error("添加失败");
+            }
+        }
+
         LambdaUpdateWrapper<Course> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        lambdaUpdateWrapper.eq(Course::getId, course.getId())
+        lambdaUpdateWrapper.eq(Course::getCourseCode, course.getCourseCode())
                 .set(Course::getCourseName, course.getCourseName())
                 .set(Course::getTeacherCode, course.getTeacherCode())
                 .set(Course::getTime, course.getTime())
@@ -100,4 +122,6 @@ public class CourseController {
             return R.error("更新失败");
         }
     }
+
+
 }

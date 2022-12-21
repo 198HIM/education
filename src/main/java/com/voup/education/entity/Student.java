@@ -27,19 +27,19 @@ public class Student implements Serializable {
     private Integer id;
 
     @TableField("studentCode")
-    private String studentCode;
+    private String studentCode="";
 
     @TableField("studentName")
-    private String studentName;
+    private String studentName="";
 
     @TableField("sex")
-    private String sex;
+    private String sex="";
 
     @TableField("college")
-    private String college;
+    private String college="";
 
     @TableField("password")
-    private String password;
+    private String password="";
 
 
 }

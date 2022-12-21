@@ -27,46 +27,46 @@ public class Course implements Serializable {
     private Integer id;
 
     @TableField("courseCode")
-    private String courseCode;
+    private String courseCode="";
 
     @TableField("courseName")
-    private String courseName;
+    private String courseName="";
 
     /**
      * 授课老师编号
      */
     @TableField("teacherCode")
-    private String teacherCode;
+    private String teacherCode="";
 
     /**
      * 上课时间
      */
     @TableField("time")
-    private String time;
+    private String time="";
 
     /**
      * 地点
      */
     @TableField("location")
-    private String location;
+    private String location="";
 
     /**
      * 周数
      */
     @TableField("weeks")
-    private String weeks;
+    private String weeks="";
 
     /**
      * 必修或者选修
      */
     @TableField("courseClass")
-    private String courseClass;
+    private String courseClass="";
 
     /**
      * 学分
      */
     @TableField("credit")
-    private String credit;
+    private String credit="";
 
 
 }

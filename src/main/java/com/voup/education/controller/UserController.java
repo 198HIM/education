@@ -10,10 +10,7 @@ import com.voup.education.utils.SHA1Util;
 import com.voup.education.utils.StringNumber;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +20,7 @@ import java.util.regex.Pattern;
  * @Date 2022 12:45
  * @Description
  **/
+@CrossOrigin(origins = "*",maxAge = 3600)
 @Slf4j
 @RestController
 @RequestMapping("//user")
@@ -40,9 +38,12 @@ public class UserController {
     String regEx2 = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,12}$";
     StringNumber stringNumber = new StringNumber();
 
+    //用户登录
     @PostMapping("/login")
     public R login(@RequestBody LoginPower loginPower) {
         System.out.println("tCode:" + loginPower.gettCode());
+
+        //管理员登录
         if (loginPower.gettCode().equals("01")) {
             QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("adminCode", loginPower.getName());
@@ -50,36 +51,41 @@ public class UserController {
 
             if (admin == null) {
                 return R.error("管理员名称不存在");
-            } else if (!loginPower.getPassword().equals(admin.getPassword())) {
+            } else if (!SHA1Util.sha1(loginPower.getPassword()).equals(admin.getPassword())) {
+
                 return R.error("管理员密码错误");
             }
-            return R.success("", "欢迎回来,管理员" + admin.getAdminName());
-
+            return R.success(admin, "欢迎回来,管理员" + admin.getAdminName());
+        //教师登录
         } else if (loginPower.gettCode().equals("02")) {
             QueryWrapper<Teacher> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("teacherCode", loginPower.getName());
             Teacher teacher = teacherService.getOne(queryWrapper);
             if (teacher == null) {
                 return R.error("教师名称不存在");
-            } else if (!loginPower.getPassword().equals(teacher.getPassword())) {
+            } else if (!SHA1Util.sha1(loginPower.getPassword()).equals(teacher.getPassword())) {
                 return R.error("教师密码错误");
             }
-            return R.success("", "欢迎回来" + teacher.getTeacherName() + "老师");
+            return R.success(teacher, "欢迎回来" + teacher.getTeacherName());
+
+        //学生登录
         } else if (loginPower.gettCode().equals("03")) {
             QueryWrapper<Student> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("studentCode", loginPower.getName());
             Student student = studentService.getOne(queryWrapper);
             if (student == null) {
                 return R.error("学生名称不存在");
-            } else if (!loginPower.getPassword().equals(student.getPassword())) {
+            } else if (!SHA1Util.sha1(loginPower.getPassword()).equals(student.getPassword())) {
+                System.out.println(loginPower.getPassword());
+                System.out.println(student.getPassword());
                 return R.error("学生密码错误");
             }
-            return R.success("", "欢迎回来" + student.getStudentName() + "同学");
+            return R.success(student, "欢迎回来" + student.getStudentName() + "同学");
         }
         return R.success(loginPower, "登录成功");
     }
 
-
+    //注册
     @PostMapping("/register")
     public R register(@RequestBody LoginPower loginPower) {
         System.out.println("tCode:" + loginPower.gettCode());
@@ -98,11 +104,12 @@ public class UserController {
             admin.setAdminName(loginPower.getName());
 
 
-            if (loginPower.getPassword().matches(regEx2) == false) {
+            if (!loginPower.getPassword().matches(regEx2)) {
                 return R.error("密码至少包含：大小写英文字母、数字、特殊符号,密码长度大于6位,小于12位");
             }
             admin.setPassword(SHA1Util.sha1(loginPower.getPassword()));
 
+            //自动生成adminCode,未调用StringNumber
             for (int i = 1; i < 9999; i++) {
                 if (i<10){
                     admin.setAdminCode("100" + i);
@@ -135,7 +142,7 @@ public class UserController {
             teacher.setTeacherName(loginPower.getName());
 
 
-            if (loginPower.getPassword().matches(regEx2) == false) {
+            if (!loginPower.getPassword().matches(regEx2)) {
                 return R.error("密码至少包含：大小写英文字母、数字、特殊符号,密码长度大于6位,小于12位");
             }
             teacher.setPassword(SHA1Util.sha1(loginPower.getPassword()));
@@ -171,7 +178,7 @@ public class UserController {
             student.setStudentName(loginPower.getName());
 
 
-            if (loginPower.getPassword().matches(regEx2) == false) {
+            if (!loginPower.getPassword().matches(regEx2)) {
                 return R.error("密码至少包含：大小写英文字母、数字、特殊符号,密码长度大于6位,小于12位");
             }
             student.setPassword(SHA1Util.sha1(loginPower.getPassword()));

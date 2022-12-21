@@ -27,31 +27,32 @@ public class Teacher implements Serializable {
     private Integer id;
 
     @TableField("teacherCode")
-    private String teacherCode;
+    private String teacherCode="";
 
     @TableField("teacherName")
-    private String teacherName;
+    private String teacherName="";
 
     @TableField("sex")
-    private String sex;
+    private String sex="";
 
     @TableField("birth")
-    private String birth;
+    private String birth="";
 
     @TableField("background")
-    private String background;
+    private String background="";
 
     @TableField("position")
-    private String position;
+    private String position="";
 
     @TableField("entryTime")
-    private String entryTime;
+    private String entryTime="";
 
     @TableField("college")
-    private String college;
+    private String college="";
 
     @TableField("password")
-    private String password;
+    private String password="";
+
 
 
 }
