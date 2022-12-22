@@ -5,17 +5,23 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.voup.education.bean.R;
-import com.voup.education.entity.Course;
-import com.voup.education.entity.Teacher;
-import com.voup.education.entity.TeacherPage;
 
+import com.voup.education.entity.*;
+
+import com.voup.education.mapper.StudentMapper;
 import com.voup.education.mapper.TeacherMapper;
+import com.voup.education.service.SelectcourseService;
+import com.voup.education.service.StudentService;
 import com.voup.education.service.TeacherService;
 import com.voup.education.utils.SHA1Util;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +44,15 @@ public class TeacherController {
 
     @Autowired
     TeacherMapper teacherMapper;
+
+    @Autowired
+    SelectcourseService selectcourseService;
+
+    @Autowired
+    StudentMapper studentMapper;
+
+    @Autowired
+    StudentService studentService;
 
     String regEx = "[ _`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]|\n|\r|\t";
     //效验密码
@@ -144,4 +159,92 @@ public class TeacherController {
             return R.error("教师信息更新失败");
         }
     }
+
+    @PostMapping("/editMyself")
+    public R editMyself(@RequestBody Teacher teacher) {
+        LambdaUpdateWrapper<Teacher> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        if (teacherService.getOne(lambdaUpdateWrapper.eq(Teacher::getTeacherCode, teacher.getTeacherCode())) == null) {
+            return R.error("系统错误,教师编号不存在,请重新登录再尝试");
+        }
+        //更新
+        if (teacher.getPassword()!=""){
+            Pattern p = Pattern.compile(regEx);
+            Matcher m = p.matcher(teacher.getTeacherName());
+            if (m.find()) {
+                return R.error("真实姓名或用户名不能含有特殊字符");
+            }
+            if (teacher.getTeacherName().length() < 1 || teacher.getTeacherName().length() > 10) {
+                return R.error("名称必须包含1至10个字符");
+            }
+
+            if (!teacher.getPassword().matches(regEx2)) {
+                return R.error("密码至少包含：大小写英文字母、数字、特殊符号,密码长度大于6位,小于12位");
+            }
+            lambdaUpdateWrapper.eq(Teacher::getTeacherCode, teacher.getTeacherCode())
+                    .set(Teacher::getTeacherName, teacher.getTeacherName())
+                    .set(Teacher::getTeacherCode, teacher.getTeacherCode())
+                    .set(Teacher::getSex, teacher.getSex())
+                    .set(Teacher::getBirth, teacher.getBirth())
+                    .set(Teacher::getBackground, teacher.getBackground())
+                    .set(Teacher::getPosition, teacher.getPosition())
+                    .set(Teacher::getEntryTime, teacher.getEntryTime())
+                    .set(Teacher::getCollege, teacher.getCollege())
+                    .set(Teacher::getPassword, SHA1Util.sha1(teacher.getPassword()));
+        }else{
+            teacher.setPassword(teacherService.getOne(new QueryWrapper<Teacher>().eq("teacherCode",teacher.getTeacherCode())).getPassword());
+            lambdaUpdateWrapper.eq(Teacher::getTeacherCode, teacher.getTeacherCode())
+                    .set(Teacher::getTeacherName, teacher.getTeacherName())
+                    .set(Teacher::getTeacherCode, teacher.getTeacherCode())
+                    .set(Teacher::getSex, teacher.getSex())
+                    .set(Teacher::getBirth, teacher.getBirth())
+                    .set(Teacher::getBackground, teacher.getBackground())
+                    .set(Teacher::getPosition, teacher.getPosition())
+                    .set(Teacher::getEntryTime, teacher.getEntryTime())
+                    .set(Teacher::getCollege, teacher.getCollege())
+                    .set(Teacher::getPassword, teacher.getPassword());
+        }
+
+        //更新中的用户名密码效验
+        if (teacherService.update(null, lambdaUpdateWrapper)) {
+            return R.success("", "教师信息更新成功");
+        } else {
+            return R.error("教师信息更新失败");
+        }
+    }
+
+    @PostMapping("/getStudent")
+    public R getCourse(@RequestBody CoursePage coursePage) {
+        QueryWrapper<Selectcourse> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("courseCode", coursePage.getCourse().getCourseCode());
+
+
+        List<Selectcourse> list = selectcourseService.list(queryWrapper);
+        int count = selectcourseService.count(queryWrapper);
+        if (count==0){
+            return R.error("该课程没有学生报名");
+        }
+        List<String> resultList = new ArrayList<>();
+        list.forEach(index ->{
+            resultList.add(index.getStudentCode());
+        });
+        //分页查询
+        Page<Student> page = new Page<>(coursePage.getCurrentPage(), coursePage.getPageSize());
+        QueryWrapper<Student> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.in("studentCode", resultList);
+
+
+        studentService.page(page, queryWrapper1);
+
+        return R.success(page, "本课学生查询成功");
+    }
+
+    @PostMapping("/delMyStudent")
+    public R delMyStudent(@RequestBody Selectcourse selectcourse) {
+        if (selectcourseService.remove(new QueryWrapper<Selectcourse>().eq("studentCode", selectcourse.getStudentCode()).eq("courseCode", selectcourse.getCourseCode()))) {
+            return R.success("","学生移除成功");
+        }else{
+            return R.error("学生移除失败");
+        }
+    }
+
 }
