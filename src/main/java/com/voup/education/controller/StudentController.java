@@ -64,7 +64,9 @@ public class StudentController {
     public R show(@RequestBody StudentPage studentPage) {
 
         Page<Student> page = new Page<>(studentPage.getCurrentPage(), studentPage.getPageSize());
+
         QueryWrapper<Student> queryWrapper = new QueryWrapper<>();
+
 
         //查询操作
         queryWrapper.like("studentCode", studentPage.getStudent().getStudentCode());
@@ -82,6 +84,7 @@ public class StudentController {
 
     @PostMapping("/delete")
     public R delete(@RequestBody Student student) {
+
         if (studentService.removeById(student.getId())) {
 
             return R.success("", "删除学生信息成功");

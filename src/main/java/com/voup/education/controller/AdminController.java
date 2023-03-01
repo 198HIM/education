@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/admin")
-public class AdminController {
+public class AdminController extends CourseController {
 
     @Autowired
     AdminService adminService;
